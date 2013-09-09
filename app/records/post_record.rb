@@ -1,3 +1,4 @@
 class PostRecord < ActiveRecord::Base
-  attr_accessible :body, :title
+  self.table_name = :posts
+  attr_accessible :id, :body, :title
 end

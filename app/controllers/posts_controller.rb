@@ -1,35 +1,27 @@
 class PostsController < ApplicationController
+  respond_to :html, :json
+
   # GET /posts
   # GET /posts.json
   def index
     @posts = PostRepository.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @posts }
-    end
+    puts 'posts'
+    puts @posts.inspect
+    respond_with @posts
   end
 
   # GET /posts/1
   # GET /posts/1.json
   def show
     @post = PostRepository.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @post }
-    end
+    respond_with @post
   end
 
   # GET /posts/new
   # GET /posts/new.json
   def new
-    @post = PostRepository.new_post
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @post }
-    end
+    @post = Post.new
+    respond_with @post
   end
 
   # GET /posts/1/edit
@@ -40,54 +32,27 @@ class PostsController < ApplicationController
   # POST /posts
   # POST /posts.json
   def create
-    @post = PostRepository.new(params[:post])
-
-    respond_to do |format|
-      if @post.save
-        format.html { redirect_to @post, notice: 'Post was successfully created.' }
-        format.json { render json: @post, status: :created, location: @post }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
-      end
-    end
+    @post = Post.new params[:post]
+    flash[:notice] = 'Post was successfully created.' if PostRepository.save(@post)
+    respond_with(@post)
   end
 
   # PUT /posts/1
   # PUT /posts/1.json
   def update
     @post = PostRepository.find(params[:id])
+    @post.attributes = params[:post]
 
-    respond_to do |format|
-      if @post.update_attributes(params[:post])
-        format.html { redirect_to @post, notice: 'Post was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: "edit" }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
-      end
-    end
+    flash[:notice] = 'Post was successfully updated.' if PostRepository.save(@post)
+    respond_with(@post)
   end
 
   # DELETE /posts/1
   # DELETE /posts/1.json
   def destroy
     @post = PostRepository.find(params[:id])
-    @post.destroy
+    PostRepository.destroy(@post)
 
-    respond_to do |format|
-      format.html { redirect_to posts_url }
-      format.json { head :no_content }
-    end
-  end
-end
-
-class PostRepository
-  def self.all
-    []
-  end
-
-  def self.new_post
-    Post.new(PostRecord.new)
+    respond_with(@post)
   end
 end
